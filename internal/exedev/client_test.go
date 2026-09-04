@@ -195,7 +195,7 @@ func TestCreateExactCommandAndOptionalPool(t *testing.T) {
 		runner := &fakeRunner{stdout: []byte("response schema is intentionally ignored")}
 		client := newTestClient(t, runner)
 		request := validCreateRequest()
-		request.Tags = []string{"owned", "fleet:queen-a"}
+		request.Tags = []string{"owned", "fleet-queen-a"}
 		originalTags := append([]string(nil), request.Tags...)
 
 		if err := client.Create(context.Background(), request); err != nil {
@@ -207,7 +207,7 @@ func TestCreateExactCommandAndOptionalPool(t *testing.T) {
 		wantArgs := append(defaultSSHArgs(),
 			"control.exe.dev", "new", "--json", "--no-email",
 			"--name=runner-a", "--cpu=2", "--memory=4GB", "--disk=20GB",
-			"--image=ubuntu:22.04", "--pool=ci", "--tag=fleet:queen-a", "--tag=owned")
+			"--image=ubuntu:22.04", "--pool=ci", "--tag=fleet-queen-a", "--tag=owned")
 		assertCalls(t, runner.calls, []recordedCall{{program: "ssh", args: wantArgs}})
 	})
 

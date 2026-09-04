@@ -3,6 +3,19 @@
 **Research date:** 2026-09-04  
 **Scope:** Published exe.dev documentation at `exe.dev/docs` only. No live CLI calls, undocumented endpoints, or inferred JSON schemas are used.
 
+## Live validation supplement
+
+The following behavior was verified against a live exe.dev account on 2026-09-04. It supplements, but does not replace, the published contract:
+
+- `whoami --json` and `ls -l --json` succeed through a dedicated registered SSH key.
+- `ls -l --json` returns the documented `vms` array plus additional fields.
+- Untagged VMs omit the `tags` member entirely.
+- Tagged VMs return `tags` as an array of strings.
+- The live `tag` command reported the accepted tag grammar as `[a-z][a-z0-9_-]*`.
+- `ssh_dest` and `ssh_host` were present; `ssh_user` was omitted where any username can route.
+
+A temporary probe tag was added to the Queen VM, observed in `ls -l --json`, and removed immediately. No VM was created or deleted during this validation.
+
 ## 1. Transport and command execution
 
 The documented programmatic API is SSH:
@@ -272,4 +285,3 @@ ssh exe.dev ssh-key generate-api-key --label=deploy --cmds="'ssh my-vm'" --exp=3
 - https://exe.dev/docs/faq/how-exedev-works
 - https://exe.dev/docs/faq/tab-completion
 - https://exe.dev/docs/all
-

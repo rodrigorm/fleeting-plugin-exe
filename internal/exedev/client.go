@@ -31,6 +31,7 @@ var (
 	absolutePathPattern = regexp.MustCompile(`^/[A-Za-z0-9._/+@-]+$`)
 	resourcePattern     = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]*$`)
 	tokenPattern        = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._/:@+=-]*$`)
+	tagPattern          = regexp.MustCompile(`^[a-z][a-z0-9_-]*$`)
 	cpuPattern          = regexp.MustCompile(`^[0-9]+$`)
 	sizePattern         = regexp.MustCompile(`^[0-9]+[A-Za-z]{0,4}$`)
 )
@@ -439,7 +440,7 @@ func ValidateCreateRequest(request CreateRequest) error {
 		return errors.New("tags must contain at least one tag")
 	}
 	for i, tag := range request.Tags {
-		if err := validateValue(fmt.Sprintf("tags[%d]", i), tag, tokenPattern); err != nil {
+		if err := validateValue(fmt.Sprintf("tags[%d]", i), tag, tagPattern); err != nil {
 			return err
 		}
 	}
