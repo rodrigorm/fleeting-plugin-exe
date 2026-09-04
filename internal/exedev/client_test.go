@@ -211,17 +211,18 @@ func TestCreateExactCommandAndOptionalPool(t *testing.T) {
 		assertCalls(t, runner.calls, []recordedCall{{program: "ssh", args: wantArgs}})
 	})
 
-	t.Run("pool omitted", func(t *testing.T) {
+	t.Run("pool and image omitted", func(t *testing.T) {
 		runner := &fakeRunner{}
 		client := newTestClient(t, runner)
 		request := validCreateRequest()
 		request.Pool = ""
+		request.Image = ""
 		if err := client.Create(context.Background(), request); err != nil {
 			t.Fatalf("Create() error = %v", err)
 		}
 		for _, arg := range runner.calls[0].args {
-			if strings.HasPrefix(arg, "--pool=") {
-				t.Fatalf("Create() args contain optional pool: %v", runner.calls[0].args)
+			if strings.HasPrefix(arg, "--pool=") || strings.HasPrefix(arg, "--image=") {
+				t.Fatalf("Create() args contain optional field: %v", runner.calls[0].args)
 			}
 		}
 	})

@@ -13,8 +13,13 @@ The following behavior was verified against a live exe.dev account on 2026-09-04
 - Tagged VMs return `tags` as an array of strings.
 - The live `tag` command reported the accepted tag grammar as `[a-z][a-z0-9_-]*`.
 - `ssh_dest` and `ssh_host` were present; `ssh_user` was omitted where any username can route.
+- `new --json` returned the requested VM name, tags, SSH routing fields, HTTPS URL, and proxy port.
+- A VM created with 1 vCPU, 3 GB memory, and 25 GB disk was immediately listed as `running` with matching resource fields.
+- Omitting `--image` selected the account's default `boldsoftware/exeuntu` image. Supplying `--image=boldsoftware/exeuntu` failed because that registry reference was not directly pullable; the plugin therefore treats image as optional.
+- The worker accepted routed SSH with the same pinned exe.dev host key and exposed Docker 29.1.3 using `overlayfs`.
+- `rm --json` returned separate `deleted` and `failed` arrays, and the VM disappeared from inventory immediately in this probe.
 
-A temporary probe tag was added to the Queen VM, observed in `ls -l --json`, and removed immediately. No VM was created or deleted during this validation.
+A temporary probe tag was added to the Queen VM, observed in `ls -l --json`, and removed immediately. A separate disposable worker completed a create, inventory, SSH/Docker, and delete cycle. No probe resources remain.
 
 ## 1. Transport and command execution
 

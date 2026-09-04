@@ -2,7 +2,7 @@
 
 A [GitLab Fleeting](https://gitlab.com/gitlab-org/fleeting/fleeting) provider plugin for autoscaling GitLab Runner jobs on exe.dev VMs.
 
-> **Status:** experimental. The SSH API client and core Fleeting lifecycle are implemented and unit-tested. Live read-only access and tag serialization were validated against exe.dev on September 4, 2026; VM creation and deletion remain untested.
+> **Status:** experimental. The SSH API client and core Fleeting lifecycle are implemented and unit-tested. A complete create → inventory → SSH/Docker → delete probe succeeded against exe.dev on September 4, 2026.
 
 ## Implemented lifecycle
 
@@ -26,7 +26,8 @@ Suspend/resume is intentionally unsupported. The plugin only manages VMs carryin
   control_host = "exe.dev"
   control_identity_file = "/etc/gitlab-runner/credentials/exe-control"
   control_known_hosts_file = "/etc/gitlab-runner/ssh/exe-known-hosts"
-  image = "ubuntu:24.04"
+  # Optional. Omit to use exe.dev's account/default image.
+  image = ""
   cpu = 1
   memory = "3GB"
   disk = "25GB"
@@ -41,14 +42,18 @@ The manager's SSH configuration supplies a dedicated control-plane identity and 
 Validated against a live exe.dev account on September 4, 2026:
 
 - dedicated-key authentication and pinned host-key verification;
-- `whoami --json`;
-- `ls -l --json`;
+- `whoami --json` and `ls -l --json`;
 - tags are omitted for untagged VMs and returned as a string array for tagged VMs;
-- tag names are accepted under the server-reported grammar `[a-z][a-z0-9_-]*`.
+- tag names use the server-reported grammar `[a-z][a-z0-9_-]*`;
+- `new --json` with explicit CPU, memory, disk, name, and tags;
+- immediate discovery as `running` with the requested resources and tags;
+- routed SSH using the pinned exe.dev host key;
+- Docker 29.1.3 with the `overlayfs` driver on the default exeuntu image;
+- `rm --json` and disappearance from inventory.
 
-The provider therefore treats missing tags as normal for unrelated VMs, but fails closed when a fleet-prefixed VM lacks the required ownership tags. In-flight creation accounting prevents repeated scaling calls from exceeding `max_size` while a new VM is not yet visible.
+The provider treats missing tags as normal for unrelated VMs, but fails closed when a fleet-prefixed VM lacks the required ownership tags. In-flight creation accounting prevents repeated scaling calls from exceeding `max_size` while a new VM is not yet visible.
 
-Still unverified: `new --json` and `rm --json` behavior, creation readiness, and Docker connectivity to a newly created worker.
+Still unverified: GitLab Runner's complete Docker Autoscaler job flow and cancellation behavior.
 
 See [`docs/exe-dev-api-contract.md`](docs/exe-dev-api-contract.md) for the documented API surface and explicitly unknown response fields.
 

@@ -86,8 +86,8 @@ func (v *VM) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// CreateRequest contains the explicit inputs used to create a VM. Pool is
-// optional; all other scalar fields and at least one tag are required.
+// CreateRequest contains the explicit inputs used to create a VM. Pool and
+// Image are optional; CPU, Memory, Disk, Name, and at least one tag are required.
 type CreateRequest struct {
 	Name   string
 	CPU    string
@@ -281,7 +281,9 @@ func (c *CLIClient) Create(ctx context.Context, request CreateRequest) error {
 		"--cpu=" + request.CPU,
 		"--memory=" + request.Memory,
 		"--disk=" + request.Disk,
-		"--image=" + request.Image,
+	}
+	if request.Image != "" {
+		args = append(args, "--image="+request.Image)
 	}
 	if request.Pool != "" {
 		args = append(args, "--pool="+request.Pool)
@@ -422,7 +424,13 @@ func ValidateCreateRequest(request CreateRequest) error {
 		{field: "cpu", value: request.CPU, pattern: cpuPattern},
 		{field: "memory", value: request.Memory, pattern: sizePattern},
 		{field: "disk", value: request.Disk, pattern: sizePattern},
-		{field: "image", value: request.Image, pattern: tokenPattern},
+	}
+	if request.Image != "" {
+		validations = append(validations, struct {
+			field   string
+			value   string
+			pattern *regexp.Regexp
+		}{field: "image", value: request.Image, pattern: tokenPattern})
 	}
 	if request.Pool != "" {
 		validations = append(validations, struct {

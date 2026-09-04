@@ -114,7 +114,6 @@ func TestInitValidation(t *testing.T) {
 		{name: "invalid cpu", mutate: func(g *InstanceGroup) { g.CPU = 0 }},
 		{name: "missing memory", mutate: func(g *InstanceGroup) { g.Memory = "" }},
 		{name: "missing disk", mutate: func(g *InstanceGroup) { g.Disk = "" }},
-		{name: "missing image", mutate: func(g *InstanceGroup) { g.Image = "" }},
 	}
 
 	for _, tt := range tests {

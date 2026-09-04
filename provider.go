@@ -327,9 +327,6 @@ func (g *InstanceGroup) validate() error {
 	if g.Disk == "" {
 		return errors.New("disk is required")
 	}
-	if g.Image == "" {
-		return errors.New("image is required")
-	}
 	if (g.ControlIdentityFile == "") != (g.ControlKnownHostsFile == "") {
 		return errors.New("control_identity_file and control_known_hosts_file must be configured together")
 	}
